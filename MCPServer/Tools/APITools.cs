@@ -44,27 +44,28 @@ namespace MCPServer.Tools
 
         // Create a new note
         [McpServerTool, Description("Create a new note")]
-        public static async Task<string> CreateNoteAsync([Description("Content of the new note")] string content)
+        public static async Task<Note?> CreateNoteAsync([Description("Content of the new note")] string content)
         {
             using var context = await GetDbContextAsync();
             var note = new Note { Content = content };
             context.Notes.Add(note);
             await context.SaveChangesAsync();
-            return $"Note created with ID: {note.Id}";
+            return note;
         }
 
         // Retrieve a note by ID
         [McpServerTool, Description("Retrieve a note by ID")]
-        public static async Task<string> GetNoteAsync([Description("ID of the note to retrieve")] int id)
+        public static async Task<Note?> GetNoteAsync([Description("ID of the note to retrieve")] int id)
         {
             using var context = await GetDbContextAsync();
-            var note = await context.Notes.FindAsync(id);
-            return note != null ? $"Note ID: {note.Id}, Content: {note.Content}" : "Note not found";
+            return await context.Notes.FindAsync(id);
         }
 
         // Update an existing note
         [McpServerTool, Description("Update an existing note")]
-        public static async Task<string> UpdateNoteAsync([Description("ID of the note to update")] int id, [Description("New content for the note")] string newContent)
+        public static async Task<Note?> UpdateNoteAsync(
+            [Description("ID of the note to update")] int id,
+            [Description("New content for the note")] string newContent)
         {
             using var context = await GetDbContextAsync();
             var note = await context.Notes.FindAsync(id);
@@ -73,14 +74,13 @@ namespace MCPServer.Tools
                 note.Content = newContent;
                 context.Notes.Update(note);
                 await context.SaveChangesAsync();
-                return $"Note ID: {note.Id} updated successfully";
             }
-            return "Note not found";
+            return note;
         }
 
         // Delete a note by ID
         [McpServerTool, Description("Delete a note by ID")]
-        public static async Task<string> DeleteNoteAsync([Description("ID of the note to delete")] int id)
+        public static async Task<Note?> DeleteNoteAsync([Description("ID of the note to delete")] int id)
         {
             using var context = await GetDbContextAsync();
             var note = await context.Notes.FindAsync(id);
@@ -88,23 +88,16 @@ namespace MCPServer.Tools
             {
                 context.Notes.Remove(note);
                 await context.SaveChangesAsync();
-                return $"Note ID: {note.Id} deleted successfully";
             }
-            return "Note not found";
+            return note;
         }
 
         // Retrieve all notes
         [McpServerTool, Description("Get all notes")]
-        public static async Task<string> GetAllNotesAsync()
+        public static async Task<List<Note>> GetAllNotesAsync()
         {
             using var context = await GetDbContextAsync();
-            var notes = await context.Notes.ToListAsync();
-            if (notes.Any())
-            {
-                var noteList = string.Join(Environment.NewLine, notes.Select(note => $"Note ID: {note.Id}, Content: {note.Content}"));
-                return noteList;
-            }
-            return "No notes found";
+            return await context.Notes.ToListAsync();
         }
     }
 }
