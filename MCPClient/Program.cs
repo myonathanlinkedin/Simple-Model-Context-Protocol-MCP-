@@ -39,7 +39,7 @@ class Program
         var mcpClient = await CreateMcpClientAsync(serverCsprojPath, samplingClient, serverName, loggerFactory);
 
         // Get all available tools
-        Console.WriteLine("Tools available:");
+        Console.WriteLine("\nTools available:");
         var tools = await mcpClient.ListToolsAsync();
         foreach (var tool in tools)
             Console.WriteLine($"  {tool}");
@@ -132,7 +132,7 @@ class Program
                 updates.Add(update);
             }
 
-            Console.WriteLine();
+            Console.WriteLine("\n");
             messages.AddMessages(updates);
         }
     }
