@@ -20,8 +20,6 @@ class Program
         string apiEndpoint = config["API:Endpoint"];  // Read API endpoint from config
         string apiKey = config["API:ApiKey"];  // Read API key from config
 
-        using var tracerProvider = SetupTracing();
-        using var metricsProvider = SetupMetrics();
         using var loggerFactory = SetupLogging();
 
         // Connect to an MCP server
@@ -52,20 +50,6 @@ class Program
         // Start interactive chat loop
         await RunChatLoopAsync(chatClient, tools);
     }
-
-    static TracerProvider SetupTracing() =>
-        Sdk.CreateTracerProviderBuilder()
-           .AddHttpClientInstrumentation()
-           .AddSource("*")
-           .AddOtlpExporter()
-           .Build();
-
-    static MeterProvider SetupMetrics() =>
-        Sdk.CreateMeterProviderBuilder()
-           .AddHttpClientInstrumentation()
-           .AddMeter("*")
-           .AddOtlpExporter()
-           .Build();
 
     static ILoggerFactory SetupLogging() =>
         LoggerFactory.Create(builder =>
